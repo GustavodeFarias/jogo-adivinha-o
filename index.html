@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Adivinhação</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-mode">
+    <div class="container">
+        <h1>Jogo de Adivinhação</h1>
+        <p>Tente adivinhar o número entre 1 e 100!</p>
+
+        <input type="number" id="guess" placeholder="Digite seu palpite" min="1" max="100" disabled>
+        <button id="checkBtn" disabled>Verificar</button>
+        
+        <p id="result"></p>
+        <p id="attempts">Tentativas restantes: <span id="attemptsLeft">10</span></p>
+        <p id="timeLeft">Tempo restante: <span id="time">30</span> segundos</p>
+        
+        <h3>Histórico de Tentativas</h3>
+        <ul id="guessHistory"></ul>
+        
+        <button id="toggleTheme">Modo Escuro</button>
+        <button id="toggleHint">Alternar Dicas</button>
+
+        <p id="bestAttempts">Melhor desempenho: <span id="bestScore">10</span> tentativas</p>
+
+        <button id="startBtn">Iniciar Jogo</button>
+        <button id="resetBtn" class="hidden">Reiniciar Jogo</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
