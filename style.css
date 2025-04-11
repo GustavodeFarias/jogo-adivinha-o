@@ -1,99 +1,205 @@
+/* Estilo Geral */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
   }
   
   body {
     font-family: Arial, sans-serif;
-    transition: background-color 0.5s, color 0.5s;
+    background-color: #f5f5f5;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
   }
   
   .container {
     text-align: center;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    color: inherit;
-  }
-  
-  input, button {
-    padding: 10px;
-    margin: 8px 0;
     width: 100%;
-    font-size: 16px;
-    color: inherit;
-    background-color: inherit;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    max-width: 600px;
+    padding: 20px;
   }
   
-  input::placeholder {
-    color: #aaa;
+  h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
   }
   
   button {
-    background-color: #3498db;
-    color: white;
-    border: none;
+    padding: 10px 20px;
+    font-size: 1.1em;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
   }
   
   button:hover {
-    background-color: #2980b9;
+    background-color: #3e8e41;
+    transform: scale(1.05);
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
   
   .hidden {
     display: none;
   }
   
-  ul {
-    list-style: none;
-    margin-top: 10px;
-    padding-left: 0;
-    text-align: left;
-  }
-  
-  #resultText {
-    margin: 12px 0;
-    font-weight: bold;
-  }
-  
-  /* Temas */
+  /* Modos de Tema */
   .light-mode {
-    background-color: #f4f4f4;
+    background-color: #f5f5f5;
     color: #333;
   }
   
   .dark-mode {
-    background-color: #1e1e1e;
-    color: #fff;
+    background-color: #333;
+    color: #f5f5f5;
   }
   
   .vibrant-mode {
-    background-color: #e67e22;
-    color: #fff;
+    background-color: #ff7f50;
+    color: white;
   }
   
-  .light-mode .container,
-  .dark-mode .container,
-  .vibrant-mode .container {
-    color: inherit;
+  button#toggleThemeBtn {
+    background-color: #4CAF50;
+    color: white;
   }
   
-  .warning {
-    color: orange;
+  /* Game Area */
+  #gameArea {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
   
-  .danger {
-    color: red;
+  input[type="number"] {
+    padding: 10px;
+    font-size: 1.2em;
+    width: 50%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
   }
+  
+  input[type="number"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+  }
+  
+  #resultText {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  
+  /* Timer */
+  #timeLeft {
+    font-size: 1.2em;
+    color: #28a745;
+  }
+  
+  #timeLeft.warning {
+    color: #f39c12;
+  }
+  
+  #timeLeft.danger {
+    color: #e74c3c;
+  }
+  
+  /* Históricos */
+  ul#guessHistory {
+    list-style-type: none;
+    margin-top: 20px;
+  }
+  
+  ul#guessHistory li {
+    font-size: 1.1em;
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  /* Buttons para Controle */
+  #menu {
+    margin-bottom: 20px;
+  }
+  
+  button#toggleChaosBtn {
+    background-color: #e74c3c;
+  }
+  
+  button#toggleFullScreenBtn {
+    background-color: #007bff;
+  }
+  
+  button#startBtn,
+  button#resetBtn,
+  button#toggleHintBtn,
+  button#toggleChaosBtn,
+  button#toggleFullScreenBtn {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  button#resetBtn.hidden,
+  button#toggleHintBtn.hidden,
+  button#toggleChaosBtn.hidden,
+  button#toggleFullScreenBtn.hidden {
+    display: none;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 2em;
+    }
+  
+    input[type="number"] {
+      width: 80%;
+    }
+  
+    button {
+      width: 100%;
+    }
+  }
+  
+  /* Modo Caótico */
+  #gameArea {
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  button#toggleChaosBtn {
+    background-color: #e74c3c;
+  }
+  
+  /* Animações */
+  @keyframes popIn {
+    0% {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  button,
+  input[type="number"] {
+    animation: popIn 0.3s ease-out;
+  }
+  
   
