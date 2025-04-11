@@ -1,144 +1,139 @@
-let randomNumber; // Número aleatório entre 1 e 100
-let attemptsLeft; // Tentativas restantes
-let timeLeft = 30; // Tempo restante (em segundos)
-let timer; // Variável para o timer
-let bestScore = localStorage.getItem('bestScore') || 10; // Melhor desempenho guardado no localStorage
+let randomNumber;
+let attemptsLeft = 10;
+let timeLeft = 30;
+let timer;
+let showHints = true;
 
-const guessInput = document.getElementById('guess');
-const checkButton = document.getElementById('checkBtn');
-const resultText = document.getElementById('result');
-const attemptsText = document.getElementById('attemptsLeft');
-const timeText = document.getElementById('time');
+const guessInput = document.getElementById('guessInput');
+const checkBtn = document.getElementById('checkBtn');
+const resultText = document.getElementById('resultText');
+const attemptsLeftSpan = document.getElementById('attemptsLeft');
+const timeLeftSpan = document.getElementById('timeLeft');
 const guessHistory = document.getElementById('guessHistory');
-const toggleThemeButton = document.getElementById('toggleTheme');
-const toggleHintButton = document.getElementById('toggleHint');
-const startButton = document.getElementById('startBtn');
-const resetButton = document.getElementById('resetBtn');
-const bestAttemptsText = document.getElementById('bestScore');
 
-// Função para atualizar o tempo
-function updateTime() {
-    timeLeft--;
-    timeText.textContent = timeLeft;
+const toggleHintBtn = document.getElementById('toggleHintBtn');
+const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+const toggleFullScreenBtn = document.getElementById('toggleFullScreenBtn');
+const startBtn = document.getElementById('startBtn');
+const resetBtn = document.getElementById('resetBtn');
+const gameArea = document.getElementById('gameArea');
 
-    if (timeLeft <= 0) {
-        clearInterval(timer); // Para o timer
-        resultText.textContent = `Você perdeu! O número era ${randomNumber}.`;
-        checkButton.disabled = true; // Desativa o botão após o tempo acabar
-    }
-}
+let themeIndex = 0;
+const themes = ['light-mode', 'dark-mode', 'vibrant-mode'];
 
-// Função para iniciar o jogo
 function startGame() {
-    randomNumber = Math.floor(Math.random() * 100) + 1; // Novo número aleatório
-    attemptsLeft = 10;
-    timeLeft = 30;
-    document.getElementById('attemptsLeft').textContent = attemptsLeft;
-    document.getElementById('time').textContent = timeLeft;
-    document.getElementById('guessHistory').innerHTML = '';
-    resultText.textContent = '';
-    guessInput.disabled = false;
-    checkButton.disabled = false;
-    startButton.classList.add('hidden'); // Esconde o botão de iniciar
-    resetButton.classList.remove('hidden'); // Exibe o botão de reiniciar
-    clearInterval(timer); // Para o timer
-    timer = setInterval(updateTime, 1000); // Reinicia o timer
+  gameArea.classList.remove('hidden');
+  startBtn.classList.add('hidden');
+  resetBtn.classList.add('hidden');
+  attemptsLeft = 10;
+  timeLeft = 30;
+  guessHistory.innerHTML = '';
+  resultText.textContent = '';
+  guessInput.value = '';
+  guessInput.disabled = false;
+  checkBtn.disabled = false;
+  attemptsLeftSpan.textContent = attemptsLeft;
+  timeLeftSpan.textContent = timeLeft;
+  timeLeftSpan.classList.remove('warning', 'danger');
+
+  randomNumber = Math.floor(Math.random() * 100) + 1;
+  clearInterval(timer);
+  timer = setInterval(updateTime, 1000);
 }
 
-// Função para dar dicas com base na proximidade
-function giveProximityHint(userGuess) {
-    const difference = Math.abs(randomNumber - userGuess);
-
-    if (difference === 0) {
-        document.body.style.backgroundColor = '#2ecc71'; // Verde para acerto
-        return "Você acertou!";
-    } else if (difference <= 5) {
-        document.body.style.backgroundColor = '#f39c12'; // Laranja para perto
-        return "Você está MUITO perto!";
-    } else if (difference <= 15) {
-        document.body.style.backgroundColor = '#f1c40f'; // Amarelo para moderado
-        return "Você está perto!";
-    } else {
-        document.body.style.backgroundColor = '#e74c3c'; // Vermelho para longe
-        return "Você está longe do número.";
-    }
+function resetGame() {
+  startGame();
 }
 
-checkButton.addEventListener('click', function() {
-    const userGuess = parseInt(guessInput.value);
+function updateTime() {
+  timeLeft--;
+  timeLeftSpan.textContent = timeLeft;
 
-    // Verifica se o valor inserido é um número válido
-    if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
-        resultText.textContent = 'Por favor, insira um número entre 1 e 100!';
-        return;
-    }
+  if (timeLeft <= 10) timeLeftSpan.classList.add('warning');
+  if (timeLeft <= 5) timeLeftSpan.classList.add('danger');
 
-    // Exibe a tentativa na lista
-    const li = document.createElement('li');
-    li.textContent = `Tentativa: ${userGuess}`;
-    guessHistory.appendChild(li);
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    endGame(false);
+  }
+}
 
-    // Verifica se o jogador adivinhou o número
-    if (userGuess === randomNumber) {
-        resultText.textContent = 'Parabéns! Você acertou o número!';
-        resultText.style.color = 'green';
-        attemptsText.textContent = 'Você acertou em ' + (10 - attemptsLeft + 1) + ' tentativas!';
-        if (attemptsLeft < bestScore) {
-            bestScore = attemptsLeft;
-            localStorage.setItem('bestScore', bestScore);
-        }
-        checkButton.disabled = true; // Desativa o botão após acertar
-        clearInterval(timer); // Para o timer
-        resetButton.classList.remove('hidden'); // Exibe o botão de reiniciar
+function checkGuess() {
+  const guess = parseInt(guessInput.value);
+  if (isNaN(guess) || guess < 1 || guess > 100) {
+    resultText.textContent = 'Digite um número entre 1 e 100!';
+    return;
+  }
+
+  const li = document.createElement('li');
+  li.textContent = `Tentativa: ${guess}`;
+  guessHistory.appendChild(li);
+
+  if (guess === randomNumber) {
+    endGame(true);
+    return;
+  }
+
+  attemptsLeft--;
+  attemptsLeftSpan.textContent = attemptsLeft;
+
+  if (attemptsLeft <= 0) {
+    endGame(false);
+    return;
+  }
+
+  if (showHints) {
+    const diff = Math.abs(randomNumber - guess);
+    if (diff <= 5) {
+      resultText.textContent = '🔥 Você está MUITO perto!';
+    } else if (diff <= 10) {
+      resultText.textContent = '😬 Está perto!';
+    } else if (guess < randomNumber) {
+      resultText.textContent = '🔼 É maior!';
     } else {
-        attemptsLeft--;
-        attemptsText.textContent = attemptsLeft;
-
-        // Dicas de proximidade
-        resultText.textContent = giveProximityHint(userGuess);
-
-        if (attemptsLeft === 0) {
-            resultText.textContent = `Você perdeu! O número era ${randomNumber}.`;
-            checkButton.disabled = true; // Desativa o botão após acabar as tentativas
-            clearInterval(timer); // Para o timer
-            resetButton.classList.remove('hidden'); // Exibe o botão de reiniciar
-        }
+      resultText.textContent = '🔽 É menor!';
     }
+  } else {
+    resultText.textContent = 'Continue tentando!';
+  }
 
-    guessInput.value = ''; // Limpa o campo de entrada
-});
+  guessInput.value = '';
+  guessInput.focus();
+}
 
-// Função para alternar entre os temas
-toggleThemeButton.addEventListener('click', function() {
-    if (document.body.classList.contains('light-mode')) {
-        document.body.classList.replace('light-mode', 'dark-mode');
-        toggleThemeButton.textContent = 'Modo Vibrante';
-    } else if (document.body.classList.contains('dark-mode')) {
-        document.body.classList.replace('dark-mode', 'vibrant-mode');
-        toggleThemeButton.textContent = 'Modo Claro';
-    } else {
-        document.body.classList.replace('vibrant-mode', 'light-mode');
-        toggleThemeButton.textContent = 'Modo Escuro';
-    }
-});
+function endGame(won) {
+  guessInput.disabled = true;
+  checkBtn.disabled = true;
+  clearInterval(timer);
+  resetBtn.classList.remove('hidden');
+  resultText.textContent = won
+    ? `🎉 Parabéns! Você acertou o número ${randomNumber}!`
+    : `💥 Que pena! O número era ${randomNumber}.`;
+}
 
-// Função para alternar dicas
-toggleHintButton.addEventListener('click', function() {
-    const hintText = resultText.textContent;
-    if (hintText.includes('Você está MUITO perto') || hintText.includes('Você está perto') || hintText.includes('Você está longe')) {
-        resultText.textContent = 'Dicas desativadas. Você pode tentar adivinhar!';
-    } else {
-        resultText.textContent = giveProximityHint(parseInt(guessInput.value));
-    }
-});
+function toggleHints() {
+  showHints = !showHints;
+  toggleHintBtn.textContent = showHints ? 'Desativar Dicas' : 'Ativar Dicas';
+}
 
-// Função para reiniciar o jogo
-resetButton.addEventListener('click', function() {
-    startGame(); // Reinicia o jogo chamando a função de iniciar
-    resultText.textContent = 'Jogo reiniciado. Tente adivinhar o número!';
-});
-  
-// Função para iniciar o jogo
-startButton.addEventListener('click', function() {
-    startGame(); // Inicia o jogo
-});
+function toggleTheme() {
+  themeIndex = (themeIndex + 1) % themes.length;
+  document.body.className = themes[themeIndex];
+}
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      alert(`Erro ao entrar em tela cheia: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+startBtn.addEventListener('click', startGame);
+resetBtn.addEventListener('click', resetGame);
+checkBtn.addEventListener('click', checkGuess);
+toggleHintBtn.addEventListener('click', toggleHints);
+toggleThemeBtn.addEventListener('click', toggleTheme);
+toggleFullScreenBtn.addEventListener('click', toggleFullScreen);
